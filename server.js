@@ -32,8 +32,8 @@ passport.use(new GoogleStrategy(
 const authRouter = express.Router();
 app.use('/auth', apiRouter);
 
-apiRouter.get('/google', passport.authenticate('google', { scope: ['email'] }));
-apiRouter.get(
+authRouter.get('/google', passport.authenticate('google', { scope: ['email'] }));
+authRouter.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/login.html' }),
   (req, res) => {
