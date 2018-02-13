@@ -1,14 +1,11 @@
+// server.js
+
 const express = require('express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const app = express();
 const port = process.env.PORT || 8050;
-
-app.use((req, res, next) => {
-  console.log(`Receiving ${req.method} to ${req.url}`);
-  next();
-});
 
 // Serve static files
 app.use(express.static(__dirname + '/public'));
@@ -21,22 +18,31 @@ passport.use(new GoogleStrategy(
     callbackURL: 'https://whispering-retreat-73590.herokuapp.com/auth/google/callback'
   },
   (accessToken, refreshToken, profile, cb) => {
-    console.log('logging in with google', profile);
+    console.log('Our user authenticated with Google, and Google sent us back this profile info identifying the authenticated user:', profile);
     return cb(null, profile);
   },
 ));
 
 // Create API endpoints
+
+// This is where users point their browsers in order to get logged in
 app.get('/auth/google', passport.authenticate('google', { scope: ['email'] }));
+
+// This is where Google sends back information to our app once a user authenticates with Google
 app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login-failure', session: false }),
+  passport.authenticate('google', { failureRedirect: '/login.html', session: false }),
   (req, res) => {
-    console.log('xcxc wooo we authenticated!!', req.user);
-    res.redirect('/');
+    console.log('wooo we authenticated, here is our user object:', req.user);
+    res.redirect('/secret');
   }
 );
-app.get('/login-failure', (req, res) => {
-  res.send('Something went wrong, and you failed to log in.')
+
+app.get('/secret', passport.authenticate('google', { scope: ['email'] }), (req, res) => {
+  res.json({
+    message: 'Congratulations! You authenticated and gained access to the secret.',
+    the_secret: 'You rule.',
+    basic_info_sent_by_google_about_the_user: req.user,
+  });
 });
 
 // Start server
