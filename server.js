@@ -33,17 +33,9 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login.html', session: false }),
   (req, res) => {
     console.log('wooo we authenticated, here is our user object:', req.user);
-    res.redirect('/secret');
+    res.redirect('/');
   }
 );
-
-app.get('/secret', passport.authenticate('google', { scope: ['email'] }), (req, res) => {
-  res.json({
-    message: 'Congratulations! You authenticated and gained access to the secret.',
-    the_secret: 'You rule.',
-    basic_info_sent_by_google_about_the_user: req.user,
-  });
-});
 
 // Start server
 const server = app.listen(port, function() {
