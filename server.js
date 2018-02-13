@@ -1,51 +1,46 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const OpenIDStrategy = require('passport-openid').Strategy;
-
-passport.use(new OpenIDStrategy(
-  {
-    returnURL: 'https://whispering-retreat-73590.herokuapp.com/auth/openid/return',
-    realm: 'https://whispering-retreat-73590.herokuapp.com',
-  },
-  (identifier, done) => {
-    console.log('xcxc creating user with id:', identifier);
-    const user = {
-      identifier,
-    };
-    done(undefined, user);
-  }
-));
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const port = process.env.PORT || 8050;
-
 // Create application
 const app = express();
 
-// Add middleware
-app.use(bodyParser.json({ type: 'application/json', limit: '50mb' }));
+app.use((req, res, next) => {
+  console.log(`Receiving ${req.method} to ${req.url}`);
+  next();
+});
 
 // Serve static files
 app.use(express.static(__dirname + '/public'));
 
-// Create auth endpoints
-const authRouter = express.Router();
-app.use('/auth', authRouter);
-authRouter.post('/openid', passport.authenticate('openid'));
-authRouter.get('/openid/return', passport.authenticate('openid', {
-  successRedirect: '/success',
-  failureRedirect: '/failure',
-}));
+// Set up passport strategy
+passport.use(new GoogleStrategy(
+  {
+    clientID: process.env.GOOGLE_OAUTH_TEST_APP_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_OAUTH_TEST_APP_CLIENT_SECRET,
+    callbackURL: 'https://whispering-retreat-73590.herokuapp.com/auth/google/callback'
+  },
+  (accessToken, refreshToken, profile, cb) => {
+    console.log('logging in with google', profile);
+    return cb(null, profile);
+  },
+));
 
 // Create API endpoints
-const apiRouter = express.Router();
+const authRouter = express.Router();
+app.use('/auth', apiRouter);
 
-app.use('/api', apiRouter);
-apiRouter.get('/', (req, res) => {
-  res.status(200).json({
-    message: 'hi greg',
-  });
-});
+apiRouter.get('/google', passport.authenticate('google', { scope: ['email'] }));
+apiRouter.get(
+  '/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login.html' }),
+  (req, res) => {
+    console.log('wooo we authenticated!!');
+    res.redirect('/');
+  }
+);
 
 // Start server
 const server = app.listen(port, function() {
