@@ -30,7 +30,7 @@ passport.use(new GoogleStrategy(
 
 // Create API endpoints
 const authRouter = express.Router();
-app.use('/auth', apiRouter);
+app.use('/auth', authRouter);
 
 authRouter.get('/google', passport.authenticate('google', { scope: ['email'] }));
 authRouter.get(
