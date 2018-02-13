@@ -27,7 +27,7 @@ passport.use(new GoogleStrategy(
 ));
 
 // Create API endpoints
-app.get('/auth/google', passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] }));
+app.get('/auth/google', passport.authenticate('google', { scope: ['email'] }));
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login-failure', session: false }),
   (req, res) => {
