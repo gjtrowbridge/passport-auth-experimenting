@@ -27,14 +27,17 @@ passport.use(new GoogleStrategy(
 ));
 
 // Create API endpoints
-app.get('/auth/google', passport.authenticate('google', { scope: ['email'] }));
+app.get('/auth/google', passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.profile.emails.read'] }));
 app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login.html', session: false }),
+  passport.authenticate('google', { failureRedirect: '/login-failure', session: false }),
   (req, res) => {
     console.log('xcxc wooo we authenticated!!', req.user);
     res.redirect('/');
   }
 );
+app.get('/login-failure', (req, res) => {
+  res.send('Something went wrong, and you failed to log in.')
+});
 
 // Start server
 const server = app.listen(port, function() {
