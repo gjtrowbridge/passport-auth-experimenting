@@ -1,11 +1,9 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-const port = process.env.PORT || 8050;
-// Create application
 const app = express();
+const port = process.env.PORT || 8050;
 
 app.use((req, res, next) => {
   console.log(`Receiving ${req.method} to ${req.url}`);
@@ -23,18 +21,14 @@ passport.use(new GoogleStrategy(
     callbackURL: 'https://whispering-retreat-73590.herokuapp.com/auth/google/callback'
   },
   (accessToken, refreshToken, profile, cb) => {
-    console.log('xcxc logging in with google', profile);
+    console.log('logging in with google', profile);
     return cb(null, profile);
   },
 ));
 
 // Create API endpoints
-const authRouter = express.Router();
-app.use('/auth', authRouter);
-
-authRouter.get('/google', passport.authenticate('google', { scope: ['email'] }));
-authRouter.get(
-  '/google/callback',
+app.get('/auth/google', passport.authenticate('google', { scope: ['email'] }));
+app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login.html', session: false }),
   (req, res) => {
     console.log('xcxc wooo we authenticated!!', req.user);
