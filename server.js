@@ -7,6 +7,17 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const app = express();
 const port = process.env.PORT || 8050;
 
+// Log all requests
+app.use((req, res, next) => {
+  const info = {
+    method: req.method,
+    headers: req.headers,
+    url: req.url
+  };
+  console.log('RECEIVED REQUEST:', JSON.stringify(info));
+  next();
+});
+
 // Serve static files
 app.use(express.static(__dirname + '/public'));
 
