@@ -14,7 +14,7 @@ app.use((req, res, next) => {
     headers: req.headers,
     url: req.url
   };
-  console.log('RECEIVED REQUEST:', JSON.stringify(info));
+  console.log('RECEIVED REQUEST:', JSON.stringify(info, null, 2));
   next();
 });
 
