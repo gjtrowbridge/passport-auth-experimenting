@@ -32,7 +32,7 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login.html', session: false }),
   (req, res) => {
     console.log('wooo we authenticated, here is our user object:', req.user);
-    res.redirect('/');
+    res.json(req.user);
   }
 );
 
