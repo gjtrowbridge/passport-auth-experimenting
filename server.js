@@ -3,12 +3,16 @@
 const express = require('express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
 
 const app = express();
 const port = process.env.PORT || 8050;
 
 // Serve static files
 app.use(express.static(__dirname + '/public'));
+
+// Add session support
+app.use(session({ secret: process.env.SESSION_SECRET || 'default_session_secret' }));
 
 // Set up passport strategy
 passport.use(new GoogleStrategy(
@@ -35,6 +39,17 @@ app.get('/auth/google/callback',
     res.json(req.user);
   }
 );
+
+app.get('/counter', (req, res) => {
+  if (req.session.views_by_user) {
+    req.session.views_by_user++;
+  } else {
+    req.session.views_by_user = 1;
+  }
+  res.send({
+    views: req.session.views_by_user
+  });
+});
 
 // Start server
 const server = app.listen(port, function() {
