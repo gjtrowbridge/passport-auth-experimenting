@@ -7,17 +7,6 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const app = express();
 const port = process.env.PORT || 8050;
 
-// Log all requests
-app.use((req, res, next) => {
-  const info = {
-    method: req.method,
-    headers: req.headers,
-    url: req.url
-  };
-  console.log('RECEIVED REQUEST:', JSON.stringify(info, null, 2));
-  next();
-});
-
 // Serve static files
 app.use(express.static(__dirname + '/public'));
 
@@ -38,9 +27,7 @@ passport.use(new GoogleStrategy(
 // Create API endpoints
 
 // This is where users point their browsers in order to get logged in
-app.get('/auth/google', passport.authenticate('google'));
-
-// This is where Google sends back information to our app once a user authenticates with Google
+// This is also where Google sends back information to our app once a user authenticates with Google
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login.html', session: false }),
   (req, res) => {
