@@ -26,7 +26,8 @@ passport.use(new GoogleStrategy(
   {
     clientID: process.env.GOOGLE_OAUTH_TEST_APP_CLIENT_ID,
     clientSecret: process.env.GOOGLE_OAUTH_TEST_APP_CLIENT_SECRET,
-    callbackURL: 'https://whispering-retreat-73590.herokuapp.com/auth/google/callback'
+    callbackURL: 'https://whispering-retreat-73590.herokuapp.com/auth/google/callback',
+    scope: ['email'],
   },
   (accessToken, refreshToken, profile, cb) => {
     console.log('Our user authenticated with Google, and Google sent us back this profile info identifying the authenticated user:', profile);
@@ -37,7 +38,7 @@ passport.use(new GoogleStrategy(
 // Create API endpoints
 
 // This is where users point their browsers in order to get logged in
-app.get('/auth/google', passport.authenticate('google', { scope: ['email'] }));
+app.get('/auth/google', passport.authenticate('google'));
 
 // This is where Google sends back information to our app once a user authenticates with Google
 app.get('/auth/google/callback',
