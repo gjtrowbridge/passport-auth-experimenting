@@ -20,6 +20,14 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+passport.serializeUser((user, done) => {
+  done(user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(user);
+});
+
 // Set up passport strategy
 passport.use(new GoogleStrategy(
   {
