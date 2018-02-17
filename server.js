@@ -68,7 +68,7 @@ app.get('/auth/google/callback',
   }
 );
 
-app.get('/secret', checkIfLoggedIn(), (req, res) => {
+app.get('/secret', checkIfLoggedIn, (req, res) => {
   res.send('Secrets secrets secrets!');
 });
 
