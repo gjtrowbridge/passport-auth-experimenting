@@ -12,7 +12,13 @@ const port = process.env.PORT || 8050;
 app.use(express.static(__dirname + '/public'));
 
 // Add session support
-app.use(session({ secret: process.env.SESSION_SECRET || 'default_session_secret' }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'default_session_secret',
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Set up passport strategy
 passport.use(new GoogleStrategy(
@@ -21,6 +27,7 @@ passport.use(new GoogleStrategy(
     clientSecret: process.env.GOOGLE_OAUTH_TEST_APP_CLIENT_SECRET,
     callbackURL: 'https://whispering-retreat-73590.herokuapp.com/auth/google/callback',
     scope: ['email'],
+    session: true,
   },
   (accessToken, refreshToken, profile, cb) => {
     console.log('Our user authenticated with Google, and Google sent us back this profile info identifying the authenticated user:', profile);
@@ -33,22 +40,19 @@ passport.use(new GoogleStrategy(
 // This is where users point their browsers in order to get logged in
 // This is also where Google sends back information to our app once a user authenticates with Google
 app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login.html', session: false }),
+  passport.authenticate('google', { failureRedirect: '/', session: true }),
   (req, res) => {
     console.log('wooo we authenticated, here is our user object:', req.user);
     res.json(req.user);
   }
 );
 
-app.get('/counter', (req, res) => {
-  if (req.session.views_by_user) {
-    req.session.views_by_user++;
-  } else {
-    req.session.views_by_user = 1;
-  }
-  res.send({
-    views: req.session.views_by_user
-  });
+app.get('/secret', passport.authenticate('google', { failureRedirect: '/', session: true }), (req, res) => {
+  res.send('Secrets secrets secrets!');
+});
+
+app.get('/secret2', passport.authenticate('session', { failureRedirect: '/', session: true }), (req, res) => {
+  res.send('Secret from session auth');
 });
 
 // Start server
