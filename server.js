@@ -22,12 +22,12 @@ app.use(passport.session());
 
 passport.serializeUser((user, done) => {
   console.log('xcxc serialize user', user);
-  done(user);
+  done(null, user);
 });
 
 passport.deserializeUser((user, done) => {
   console.log('xcxc deserialize user', user);
-  done(user);
+  done(null, user);
 });
 
 // Set up passport strategy
