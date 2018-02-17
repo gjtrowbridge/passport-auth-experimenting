@@ -30,6 +30,17 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
+
+const checkIfLoggedIn = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.status(403).json({
+      message: 'must be logged in to continue',
+    });
+  }
+};
+
 // Set up passport strategy
 passport.use(new GoogleStrategy(
   {
@@ -57,12 +68,8 @@ app.get('/auth/google/callback',
   }
 );
 
-app.get('/secret', passport.authenticate('google', { failureRedirect: '/', session: true }), (req, res) => {
+app.get('/secret', checkIfLoggedIn(), (req, res) => {
   res.send('Secrets secrets secrets!');
-});
-
-app.get('/secret2', passport.authenticate('session', { failureRedirect: '/', session: true }), (req, res) => {
-  res.send('Secret from session auth');
 });
 
 // Start server
