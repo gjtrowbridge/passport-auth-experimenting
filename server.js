@@ -21,17 +21,15 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser((user, done) => {
-  console.log('xcxc serialize user', user);
   done(null, user);
 });
 
-passport.deserializeUser((user, done) => {
-  console.log('xcxc deserialize user', user);
-  done(null, user);
+passport.deserializeUser((userDataFromCookie, done) => {
+  done(null, userDataFromCookie);
 });
 
-
-const checkIfLoggedIn = (req, res, next) => {
+// Checks if a user is logged in
+const accessProtectionMiddleware = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
@@ -68,8 +66,11 @@ app.get('/auth/google/callback',
   }
 );
 
-app.get('/secret', checkIfLoggedIn, (req, res) => {
-  res.send('Secrets secrets secrets!');
+app.get('/protected', accessProtectionMiddleware, (req, res) => {
+  res.json({
+    message: 'You have accessed the protected endpoint!',
+    yourUserInfo: req.user,
+  });
 });
 
 // Start server
