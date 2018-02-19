@@ -63,7 +63,18 @@ app.get('/auth/google/callback',
   (req, res) => {
     console.log('wooo we authenticated, here is our user object:', req.user);
     // res.json(req.user);
-    res.redirect('/');
+    const htmlWithEmbeddedJWT = `
+    <html>
+      <script>
+        // Save JWT to localStorage
+        window.localStorage.setItem('JWT', 'my-jwt');
+        // Redirect browser to root of application
+        window.location.href = '/';
+      </script>
+    </html>
+    `;
+
+    res.send(htmlWithEmbeddedJWT);
   }
 );
 
